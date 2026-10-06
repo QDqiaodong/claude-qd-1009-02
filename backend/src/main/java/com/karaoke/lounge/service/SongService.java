@@ -24,15 +24,28 @@ public class SongService {
         this.songRepository = songRepository;
     }
 
+    /**
+     * 查询歌曲，语种参数三态口径明确：
+     * <ul>
+     *   <li>不传 language（null）：明确的「全部」状态，返回全库；</li>
+     *   <li>传空白串：属于参数错误（不能被静默当作「全部」，否则调用方无法区分是无结果还是参数错误）；</li>
+     *   <li>传非白名单语种：参数错误，错误信息中给出合法取值。</li>
+     * </ul>
+     */
     @Transactional(readOnly = true)
     public List<Song> list(String language) {
-        if (language != null && !language.isBlank()) {
-            if (!Dict.isValidSongLanguage(language)) {
-                throw new BizException("歌曲语种不合法：" + language);
-            }
-            return songRepository.findByLanguage(language);
+        if (language == null) {
+            return songRepository.findAll();
         }
-        return songRepository.findAll();
+        String normalized = language.trim();
+        if (normalized.isEmpty()) {
+            throw new BizException("歌曲语种参数不能为空白：如需查询全部歌曲，请省略 language 参数");
+        }
+        if (!Dict.isValidSongLanguage(normalized)) {
+            throw new BizException("歌曲语种不合法：" + language + "，应为 " + Dict.SONG_LANGUAGES
+                    + " 之一；如需查询全部歌曲，请省略 language 参数");
+        }
+        return songRepository.findByLanguage(normalized);
     }
 
     @Transactional(readOnly = true)

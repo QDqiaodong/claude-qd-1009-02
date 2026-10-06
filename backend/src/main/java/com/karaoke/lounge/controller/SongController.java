@@ -25,6 +25,12 @@ public class SongController {
         this.songService = songService;
     }
 
+    /**
+     * 歌曲列表。
+     *
+     * <p>语种口径：不传 language 表示「全部」返回全库；传空白或非
+     * 国语/粤语/英文/日文 的取值一律 400 参数错误，不会静默降级为全部或空表。</p>
+     */
     @GetMapping
     public ApiResponse<List<Song>> list(@RequestParam(required = false) String language) {
         return ApiResponse.success(songService.list(language));

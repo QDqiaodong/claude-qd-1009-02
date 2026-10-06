@@ -72,6 +72,9 @@ public final class Dict {
     // ---------------- 歌曲语种 ----------------
     public static final List<String> SONG_LANGUAGES = List.of("国语", "粤语", "英文", "日文");
 
+    /** 语种筛选的显式“全部”取值：与具体语种一样是合法入参，区别于空白、缺省等模糊口径 */
+    public static final String SONG_LANGUAGE_ALL = "全部";
+
     private static final Map<String, String> SONG_LANGUAGE_NAME = Map.of(
             "国语", "国语",
             "粤语", "粤语",
@@ -128,6 +131,14 @@ public final class Dict {
 
     public static boolean isValidSongLanguage(String language) {
         return language != null && SONG_LANGUAGE_NAME.containsKey(language);
+    }
+
+    /**
+     * 是否为合法的语种筛选取值：具体语种或显式的“全部”。
+     * 空白字符串不是合法筛选口径，调用方必须显式表达“全部”或干脆不传参。
+     */
+    public static boolean isValidSongLanguageFilter(String language) {
+        return SONG_LANGUAGE_ALL.equals(language) || isValidSongLanguage(language);
     }
 
     public static String songLanguageName(String language) {
